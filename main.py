@@ -1,20 +1,29 @@
+import sys
+
 from sklearn.ensemble import RandomForestClassifier
 
 from dataset_gen import make_classification_dataset
 from iterative_sampler import IterativeSampler
+from options import get_args
 
-# Generowanie przykładowych danych
-X, y = make_classification_dataset()
 
-# Tworzenie modelu
-model = RandomForestClassifier()
+def run(args):
+    X_train, X_test, y_train, y_test = make_classification_dataset(args=args)
 
-# Inicjalizacja IterativeSampler
-sampler = IterativeSampler(model, criterion='hard', sample_size=100, step_size=50, max_iter=10)
+    model = RandomForestClassifier()
 
-# Trenowanie modelu z iteracyjnym próbkowaniem
-sampler.fit(X, y)
+    sampler = IterativeSampler(model=model,
+                               strategy=args.strategy,
+                               init_sample_pool_size=args.init_sample_pool_size,
+                               step_size=args.step_size,
+                               max_iter=args.max_iter,
+                               random_state=args.seed)
+    sampler = sampler.fit(X_train, y_train)
 
-# Pobieranie historii wyników
-history = sampler.get_history()
-print("Historia wyników:", history)
+    history = sampler.get_history()
+    print("Training accuracy:", history)
+
+
+if __name__ == "__main__":
+    args = get_args(sys.argv[1:])
+    run(args)
