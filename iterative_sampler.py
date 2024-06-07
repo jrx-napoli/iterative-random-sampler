@@ -1,8 +1,8 @@
 import numpy as np
 from scipy.stats import entropy
+from sklearn.base import BaseEstimator, clone
 from sklearn.metrics import accuracy_score, mean_squared_error
 from sklearn.model_selection import train_test_split
-from sklearn.base import BaseEstimator, clone
 
 
 class IterativeSampler(BaseEstimator):
@@ -54,6 +54,7 @@ class IterativeSampler(BaseEstimator):
     set_params(**params)
         Set the parameters of this estimator wrapper.
     """
+
     def __init__(self, model, strategy='hard', init_sample_pool_size=0.01, step_size=100, max_iter=10, random_state=42):
         self.model_ = None
         self.model = model

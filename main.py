@@ -1,7 +1,5 @@
 import sys
-
 import numpy as np
-
 import datasets
 import models
 from iterative_sampler import IterativeSampler
@@ -19,8 +17,8 @@ def run(args):
                                max_iter=args.max_iter,
                                random_state=args.seed)
     sampler = sampler.fit(X_train, y_train)
-
-    print("Final test score:", np.round(sampler.score(X_test, y_test)), 3)
+    score = sampler.score(X_test, y_test)
+    print("Final test score:", np.round(score, 3))
 
 
 if __name__ == "__main__":
