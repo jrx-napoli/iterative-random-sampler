@@ -1,1 +1,1 @@
-# weighted-random-sampler
+# iterative-random-sampler
