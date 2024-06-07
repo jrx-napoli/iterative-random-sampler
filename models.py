@@ -2,6 +2,7 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
 
 def random_forest_classifier():
+    model = RandomForestClassifier().fit
     return RandomForestClassifier()
 
 
