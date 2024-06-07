@@ -46,6 +46,10 @@ class IterativeSampler:
         self.eval_history_ = []
 
         for i in range(self.max_iter):
+            if len(self.X_pool) == 0:
+                print("x pool is empty")
+                break
+
             self.model_.fit(self.X_train, self.y_train)
 
             if hasattr(self.model_, 'predict_proba'):

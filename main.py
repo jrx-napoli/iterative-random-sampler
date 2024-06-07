@@ -1,16 +1,14 @@
 import sys
 
-from sklearn.ensemble import RandomForestClassifier
-
-from dataset_gen import make_classification_dataset
+import datasets
+import models
 from iterative_sampler import IterativeSampler
 from options import get_args
 
 
 def run(args):
-    X_train, X_test, y_train, y_test = make_classification_dataset(args=args)
-
-    model = RandomForestClassifier()
+    X_train, X_test, y_train, y_test = datasets.__dict__[args.experiment](args=args)
+    model = models.__dict__[args.model]()
 
     sampler = IterativeSampler(model=model,
                                strategy=args.strategy,
