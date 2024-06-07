@@ -5,9 +5,9 @@ from sklearn.metrics import accuracy_score, mean_squared_error
 from sklearn.model_selection import train_test_split
 
 
-class IterativeSampler(BaseEstimator):
+class IterativeFitter(BaseEstimator):
     """
-    IterativeSampler performs iterative sampling to enhance model training by
+    IterativeFitter performs iterative sampling to enhance model training by
     selectively adding examples to the training set based on specified criteria.
 
     Parameters
@@ -65,7 +65,7 @@ class IterativeSampler(BaseEstimator):
         self.random_state = random_state
         np.random.seed(self.random_state)
 
-    def _get_extensions_idx(self, predictions):
+    def _get_samples_idx(self, predictions):
         match self.strategy:
             # The 'hard' strategy is based on selecting samples
             # which pose the highest challenge for the model. The metric
@@ -106,7 +106,7 @@ class IterativeSampler(BaseEstimator):
         Returns
         -------
         self : object
-            IterativeSampler object.
+            IterativeFitter object.
         """
         # Split X and y into a set of initial training samples
         # and a set of remaining data to sample from
@@ -125,7 +125,7 @@ class IterativeSampler(BaseEstimator):
                 predictions = self.model_.predict_proba(self.X_pool)
             else:
                 predictions = self.model_.predict(self.X_pool).reshape(-1, 1)
-            selected_indices = self._get_extensions_idx(predictions)
+            selected_indices = self._get_samples_idx(predictions)
 
             # Add selected samples to training set
             # and remove them from sampling pool
@@ -204,7 +204,7 @@ class IterativeSampler(BaseEstimator):
 
     def get_params(self):
         """
-        Get parameters for this IterativeSampler.
+        Get parameters for this IterativeFitter.
 
         Returns
         -------
@@ -227,12 +227,12 @@ class IterativeSampler(BaseEstimator):
         Parameters
         ----------
         **params : dict
-            IterativeSampler parameters.
+            IterativeFitter parameters.
 
         Returns
         -------
         self : object
-            IterativeSampler instance.
+            IterativeFitter instance.
         """
         for param, value in params.items():
             setattr(self, param, value)
