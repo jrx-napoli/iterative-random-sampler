@@ -1,13 +1,12 @@
 import numpy as np
+from scipy.stats import entropy
 from sklearn.base import clone
 from sklearn.metrics import accuracy_score, mean_squared_error
 from sklearn.model_selection import train_test_split
-from scipy.stats import entropy
 
 
 class IterativeSampler:
-    def __init__(self, model, strategy='hard', init_sample_pool_size=0.2, step_size=50, max_iter=10, random_state=42):
-        self.eval_history_ = None
+    def __init__(self, model, strategy='hard', init_sample_pool_size=0.01, step_size=100, max_iter=10, random_state=42):
         self.model_ = None
         self.model = model
         self.strategy = strategy
@@ -43,11 +42,9 @@ class IterativeSampler:
             X, y, train_size=self.init_sample_pool_size, random_state=self.random_state
         )
         self.model_ = clone(self.model)
-        self.eval_history_ = []
 
         for i in range(self.max_iter):
             if len(self.X_pool) == 0:
-                print("x pool is empty")
                 break
 
             self.model_.fit(self.X_train, self.y_train)
@@ -57,7 +54,7 @@ class IterativeSampler:
             else:
                 predictions = self.model_.predict(self.X_pool).reshape(-1, 1)
             selected_indices = self._get_extensions_idx(predictions)
-            
+
             # Add selected samples to training set
             # and remove them from sampling pool
             self.X_train = np.vstack([self.X_train, self.X_pool[selected_indices]])
@@ -65,17 +62,38 @@ class IterativeSampler:
             self.X_pool = np.delete(self.X_pool, selected_indices, axis=0)
             self.y_pool = np.delete(self.y_pool, selected_indices, axis=0)
 
-            score = self.evaluate_model(self.X_train, self.y_train)
-            self.eval_history_.append(np.round(score, 3))
+            score = self.score(self.X_train, self.y_train)
+            print(f'Iteration {i}/{self.max_iter}, training score: {np.round(score, 3)}')
 
         return self
 
-    def evaluate_model(self, X, y):
-        predictions = self.model_.predict(X)
+    def predict(self, X):
+        return self.model_.predict(X)
+
+    def predict_proba(self, X):
+        if hasattr(self.model_, 'predict_proba'):
+            return self.model_.predict_proba(X)
+        else:
+            raise AttributeError(f"{self.model_.__class__.__name__} does not have method 'predict_proba'")
+
+    def score(self, X, y):
+        predictions = self.predict(X)
         if hasattr(self.model_, 'predict_proba'):
             return accuracy_score(y, predictions)
         else:
             return mean_squared_error(y, predictions)
 
-    def get_history(self):
-        return self.eval_history_
+    def get_params(self):
+        return {
+            'model': self.model,
+            'strategy': self.strategy,
+            'init_sample_pool_size': self.init_sample_pool_size,
+            'step_size': self.step_size,
+            'max_iter': self.max_iter,
+            'random_state': self.random_state
+        }
+
+    def set_params(self, **params):
+        for param, value in params.items():
+            setattr(self, param, value)
+        return self

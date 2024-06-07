@@ -18,8 +18,7 @@ def run(args):
                                random_state=args.seed)
     sampler = sampler.fit(X_train, y_train)
 
-    history = sampler.get_history()
-    print("Training accuracy:", history)
+    print("Final test score:", sampler.score(X_test, y_test))
 
 
 if __name__ == "__main__":

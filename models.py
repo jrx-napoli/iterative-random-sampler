@@ -6,4 +6,4 @@ def random_forest_classifier():
 
 
 def random_forest_regressor():
-    return RandomForestRegressor
+    return RandomForestRegressor()
